@@ -1,18 +1,119 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <main class="home">
+    <p>userSessions: {{sessions}}</p>
+    <p>userBreakTime: {{breakTime}}</p>
+    <p>userStartTime: {{startTime}}</p>
+    <p>userEndTime: {{endTime}}</p>
+    <form >
+      <div>
+        <label>
+          Sessions
+          <input v-model="sessions" type="number" class="sessions" placeholder="How many sessions do you want to do?">
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Break time
+          <input v-model="breakTime" type="number" min="0" max="60" class=" break-time" placeholder="How long do you want your break?">
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Start Time
+          <input v-model="startTime" type="time" class="start-time" placeholder="When do you want to start?">
+        </label>
+      </div>
+
+      <div>
+        <label>
+          End time
+          <input v-model="endTime" type="time" class="end-time" placeholder="When do you want to stop?">
+        </label>
+      </div>
+
+      <button @click.prevent="calculateSessions">Set</button>
+    </form>
+
+    <p v-if="enoughTime">your session consist of: {{sessionUnitTime}} minutes</p>
+    <ul v-for="timeFrame in allSessionTimeFrame" :key="timeFrame">
+      <li>{{timeFrame}}</li>
+    </ul>
+  </main>
 </template>
 
 <script>
+import moment from 'moment'
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
 export default {
   name: 'home',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      sessions: 4,
+      breakTime: 20,
+      startTime: '10:00',
+      endTime: '14:00',
+      enoughTime: false,
+      sessionUnitTime: 0,
+      allSessionTimeFrame: []
+    }
+  },
+  computed: {
+  },
+  methods: {
+    calculateSessions() {
+      const totalTime = this.calculateTimeDifference()
+      const breakTime = this.calculateBreakTime()
+
+      if(breakTime < totalTime) {
+        this.enoughTime = true
+        const workTime = totalTime - breakTime
+        const sessionUnitTime = workTime/this.sessions
+        this.sessionUnitTime = Math.floor(sessionUnitTime)
+        this.showTimeFrame(this.sessionUnitTime)
+      }
+
+
+      // const data = {
+      //   sessions: this.sessions,
+      //   breakTime: this.breakTime,
+      //   startTime: this.startTime,
+      //   endTime: this.endTime
+      // }
+
+      // console.log('data: ', data);
+      // this.$store.dispatch('calculateSessions', data)
+    },
+    //calculateTimeDifferenceInMinute
+    calculateTimeDifference() {
+      const startTime = moment(this.startTime, "HH,mm")
+      const endTime = moment(this.endTime, "HH,mm")
+      //calculate the difference (in milliseconds)
+      const timeDifferenceInMilliseconds = endTime.diff(startTime)
+      const minute = 60*1000
+
+      const timeDifferenceInMinute = timeDifferenceInMilliseconds/minute
+
+      return timeDifferenceInMinute
+    },
+    calculateBreakTime() {
+      const totalBreakTime = this.breakTime*this.sessions
+      return totalBreakTime
+    },
+    showTimeFrame(sessionUnitTime) {
+      const startTime = moment(this.startTime, "HH:mm")
+      const sessions = this.sessions
+
+      const allTimeFrame = []
+
+      for(let i = 0; i < sessions; i++) {
+        const timeFrame = startTime.add(sessionUnitTime, 'minutes').format('HH:mm');
+        allTimeFrame.push(timeFrame)
+      }
+      
+      this.allSessionTimeFrame = allTimeFrame
+    }
   }
 }
 </script>
