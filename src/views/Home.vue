@@ -32,7 +32,7 @@
       <button @click.prevent="calculateSessions">Set</button>
     </form>
 
-    <p v-if="enoughTime">your session consist of: {{sessionUnitTime}} minutes</p>
+    <p v-if="enoughTime">You have {{this.sessions}} sessions of {{sessionUnitTime}} minutes</p>
     <ul v-for="timeFrame in allSessionTimeFrame" :key="timeFrame.id">
       <li>
         <p>sessionTime: {{timeFrame.sessionTime.startTime}} - {{timeFrame.sessionTime.endTime}}</p>
@@ -58,7 +58,19 @@ export default {
       allSessionTimeFrame: []
     }
   },
-  computed: {
+  watch: {
+    sessions() {
+      this.calculateSessions()
+    },
+    breakTime() {
+      this.calculateSessions()
+    },
+    startTime() {
+      this.calculateSessions()
+    },
+    endTime() {
+      this.calculateSessions()
+    }
   },
   methods: {
     calculateSessions() {
