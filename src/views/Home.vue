@@ -1,9 +1,5 @@
 <template>
   <main class="home">
-    <p>userSessions: {{sessions}}</p>
-    <p>userBreakTime: {{breakTime}}</p>
-    <p>userStartTime: {{startTime}}</p>
-    <p>userEndTime: {{endTime}}</p>
     <form >
       <div>
         <label>
@@ -37,8 +33,11 @@
     </form>
 
     <p v-if="enoughTime">your session consist of: {{sessionUnitTime}} minutes</p>
-    <ul v-for="timeFrame in allSessionTimeFrame" :key="timeFrame">
-      <li>{{timeFrame}}</li>
+    <ul v-for="timeFrame in allSessionTimeFrame" :key="timeFrame.id">
+      <li>
+        <p>sessionTime: {{timeFrame.sessionTime.startTime}} - {{timeFrame.sessionTime.endTime}}</p>
+        <p>breakTime: {{timeFrame.breakTime.startTime}} - {{timeFrame.breakTime.endTime}}</p>
+      </li>
     </ul>
   </main>
 </template>
@@ -50,10 +49,10 @@ export default {
   name: 'home',
   data() {
     return {
-      sessions: 4,
-      breakTime: 20,
-      startTime: '10:00',
-      endTime: '14:00',
+      sessions: 0,
+      breakTime: 0,
+      startTime: '',
+      endTime: '',
       enoughTime: false,
       sessionUnitTime: 0,
       allSessionTimeFrame: []
@@ -69,21 +68,9 @@ export default {
       if(breakTime < totalTime) {
         this.enoughTime = true
         const workTime = totalTime - breakTime
-        const sessionUnitTime = workTime/this.sessions
-        this.sessionUnitTime = Math.floor(sessionUnitTime)
+        this.sessionUnitTime = Math.floor(workTime/this.sessions)
         this.showTimeFrame(this.sessionUnitTime)
       }
-
-
-      // const data = {
-      //   sessions: this.sessions,
-      //   breakTime: this.breakTime,
-      //   startTime: this.startTime,
-      //   endTime: this.endTime
-      // }
-
-      // console.log('data: ', data);
-      // this.$store.dispatch('calculateSessions', data)
     },
     //calculateTimeDifferenceInMinute
     calculateTimeDifference() {
@@ -102,17 +89,27 @@ export default {
       return totalBreakTime
     },
     showTimeFrame(sessionUnitTime) {
-      const startTime = moment(this.startTime, "HH:mm")
+       // We need to know when the session need to be started, that's why a start time has been added
+      const time = moment(this.startTime, 'HH:mm')
       const sessions = this.sessions
-
-      const allTimeFrame = []
+      const allSessionsTimeFrame = []
 
       for(let i = 0; i < sessions; i++) {
-        const timeFrame = startTime.add(sessionUnitTime, 'minutes').format('HH:mm');
-        allTimeFrame.push(timeFrame)
+        const session = {
+          sessionTime : {
+            startTime: time.format('HH.mm'),
+            endTime: time.add(sessionUnitTime, 'minutes').format('HH:mm')
+          },
+          breakTime : 
+            { 
+              startTime: time.format('HH.mm'),
+              endTime: time.add(this.breakTime, 'minutes').format('HH.mm')
+            }
+        }
+        allSessionsTimeFrame.push(session)
       }
       
-      this.allSessionTimeFrame = allTimeFrame
+      this.allSessionTimeFrame = allSessionsTimeFrame
     }
   }
 }
