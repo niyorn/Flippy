@@ -4,7 +4,8 @@
       <div>
         <label>
           Sessions
-          <input v-model="sessions" type="number" step="" class="sessions" placeholder="How many sessions do you want to do?">
+          <input v-model="sessions" type="number" step="" class="sessions"
+            placeholder="How many sessions do you want to do?">
         </label>
       </div>
 
@@ -35,10 +36,12 @@
 
     <section v-if="enoughTime" class="session-container">
       <p class="description">You have {{this.sessions}} sessions of {{sessionUnitTime}} minutes</p>
-      <SessionItem v-for="(timeFrame,index) in allSessionTimeFrame" :key="timeFrame.id"
-        :index="index+1"
-        :sessionStartTime='timeFrame.sessionTime.startTime' :sessionEndTime='timeFrame.sessionTime.endTime'
-        :breakStartTime='timeFrame.breakTime.startTime' :breakEndTime='timeFrame.breakTime.endTime' />
+      <transition-group name="session-item" tag="article">
+        <SessionItem v-for="(timeFrame,index) in allSessionTimeFrame" :key="index" :index="index+1"
+          :sessionStartTime='timeFrame.sessionTime.startTime' :sessionEndTime='timeFrame.sessionTime.endTime'
+          :breakStartTime='timeFrame.breakTime.startTime' :breakEndTime='timeFrame.breakTime.endTime' 
+        />
+      </transition-group>
     </section>
   </main>
 </template>
@@ -136,5 +139,14 @@
     .description {
       text-align: center;
     }
+  }
+
+  .session-item-enter-active, .session-item-leave-active {
+    transition: all 0.2s ease-out;
+  }
+
+  .session-item-enter, .session-item-leave-to {
+    transform: scale(0.7);
+    opacity: 0;
   }
 </style>
