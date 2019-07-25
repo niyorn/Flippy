@@ -36,12 +36,10 @@
 
     <section v-if="enoughTime" class="session-container">
       <p class="description">You have {{this.sessions}} sessions of {{sessionUnitTime}} minutes</p>
-      <transition-group name="session-item" tag="article">
-        <SessionItem v-for="(timeFrame,index) in allSessionTimeFrame" :key="index" :index="index+1"
+        <SessionItem v-for="(timeFrame,index) in allSessionTimeFrame" :key="timeFrame.sessionTime.startTime" :index="index+1"
           :sessionStartTime='timeFrame.sessionTime.startTime' :sessionEndTime='timeFrame.sessionTime.endTime'
           :breakStartTime='timeFrame.breakTime.startTime' :breakEndTime='timeFrame.breakTime.endTime' 
         />
-      </transition-group>
     </section>
   </main>
 </template>
@@ -139,14 +137,5 @@
     .description {
       text-align: center;
     }
-  }
-
-  .session-item-enter-active, .session-item-leave-active {
-    transition: all 0.2s ease-out;
-  }
-
-  .session-item-enter, .session-item-leave-to {
-    transform: scale(0.7);
-    opacity: 0;
   }
 </style>
